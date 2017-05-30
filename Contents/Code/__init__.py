@@ -206,7 +206,14 @@ def GetPhotoAlbum(url, title):
         page = HTTP.Request(url, {'method':'GET'}, headers=HEADERS).content
         imgs = RE_IMGURL.findall(page)
 
-    for idx, img_url in enumerate(imgs):
+    url_parts = url.split('//', 1)
+    base_url = url_parts[0]+'//'+url_parts[1].split('/', 1)[0]
+    idx = 0
+    for idx2, img_url in enumerate(imgs):
+        if img_url.endswith('iframe'):
+            continue
+        if not img_url.startswith('http'):
+            img_url = base_url + img_url
         Log.Debug(img_url)
         oc.add(
             PhotoObject(
@@ -216,6 +223,7 @@ def GetPhotoAlbum(url, title):
                 thumb = img_url,
                 items = [MediaObject(parts=[PartObject(key=img_url)])]
             ))
+        idx = idx + 1
 
     return oc
 
